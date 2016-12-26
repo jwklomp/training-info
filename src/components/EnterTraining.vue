@@ -3,7 +3,7 @@
   <div class="enter-training">
     <div class="">
     <h2>Enter a training:</h2>
-    <datepicker placeholder="Select Date"></datepicker>
+    <datepicker placeholder="Select Date" v-on:selected="setDate" ></datepicker>
     <select v-model="trainingType">
       <option>rowing</option>
       <option>ergo</option>
@@ -48,21 +48,19 @@
     <button  class="btn btn-default submit-btn" v-on:click="submit()">Submit</button>
 </div>  
 
-<div id="container" v-if="trainingDetailData"></div>
+<training-graph v-bind:graph-data-array='file'></training-graph>
 
 </template>
 
 <script>
 import Datepicker from 'vuejs-datepicker'
-import _ from 'underscore'
 import firebase from 'firebase'
-
-var Highcharts = require('highcharts')
-var moment = require('moment')
+import TrainingGraph from './TrainingGraph.vue'
 
 export default {
     components: {
-        Datepicker
+        Datepicker,
+        TrainingGraph
     },
 
   props: ['logstatus'],
@@ -72,55 +70,10 @@ export default {
       training: '3 x 10 min',
       trainingName: 'Training Name',
       trainingType: 'rowing',
-      date: new Date(),
+      trainingDate: null,
       rating: 0,
       file: '',
-      trainingDetailData: {},
-      jsonDetailData: {}
-    }
-  },
-  watch: {
-    // whenever jsonDetailData changes, create a new graph
-    jsonDetailData: function () {
-      Highcharts.chart('container', {
-            chart: {
-                zoomType: 'x'
-            },
-            title: {
-                text: 'Training speed and stroke rate',
-                x: -20 //center
-            },
-            xAxis: {
-                type: 'datetime'
-            },
-            yAxis: {
-                title: {
-                    text: 'Speed (km/h) and Stroke rate'
-                },
-                plotLines: [{
-                    value: 0,
-                    width: 1,
-                    color: '#808080'
-                }]
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle',
-                borderWidth: 0
-            },
-            series: [{
-                      name: 'Speed',
-                      data: _.map(this.jsonDetailData, function(entry) {
-                              return [entry.time, entry.speed] 
-                            })
-                    }, {
-                      name: 'Stroke rate',
-                      data: _.map(this.jsonDetailData, function(entry) {
-                              return [entry.time, entry.strokeRate] 
-                    })
-            }]
-        })
+      data: ''
     }
   },
   computed: {
@@ -148,9 +101,9 @@ export default {
         training: this.training,
         trainingName: this.trainingName,
         trainingType: this.trainingType,
-        date: this.date,
+        trainingDate: this.trainingDate,
         rating: this.rating,
-        trainingDetailData: this.trainingDetailData,
+        data: this.data,
         time: d
       })
       this.$route.router.go({path: '/traininglist'})
@@ -178,59 +131,19 @@ export default {
       var vm = this
       reader.onload = (e) => {
         vm.file = e.target.result.split('\n') 
-        vm.readGraphFileData(vm.file)
-        vm.file = inputFile.name
+        vm.data = e.target.result
       }
       reader.readAsText(inputFile) // we want text output
-    },
-    readGraphFileData(graphDataArray) {
-      // get the date 
-      var dateLine = _.find(graphDataArray, function(line){ 
-        return line && new RegExp('^' + 'Start Time').test(line)
-        }
-      )
-      var dateLineArray = dateLine.split(',')
-      var dateTime = dateLineArray[1]
-      var datePart = dateTime.split(' ')[0].split('/') // format is dd/mm/yy eg 27/11/16
-      var outputDate = '20' + datePart[2] + '-' + datePart[1] + '-' + datePart[0]
-      console.log('outputDate', outputDate)
-      // get the line where the detail data starts
-      var detailDataLineNumber = _.findIndex(graphDataArray, function(line){ 
-        return line && new RegExp('^' + 'Session Detail Data').test(line)
-        }
-      )
-
-      // get the line where the detail data header is      
-      var detailDataWithTitles = graphDataArray.slice(detailDataLineNumber, graphDataArray.length)
-      var headerLineNumber = _.findIndex(detailDataWithTitles, function(line){ 
-        return line && new RegExp('^' + 'Interval').test(line)
-        }
-      )
-
-      // detaildata starts 2 lines after the header and ends 1 line before EOF
-      var detailData = detailDataWithTitles.slice(headerLineNumber + 2, detailDataWithTitles.length - 1)
-
-      // transform the data to JSON. Line has structure of: Interval,Elapsed Time,GPS Distance,GPS Split,GPS Speed,Stroke Rate,Heart Rate,Stroke Count
-      // so in a 0 based array we want occurances 1, 4, 5. 
-
-      this.jsonDetailData = _.map(detailData, function(line) {
-        var inputArray = line.split(',')
-
-        return {
-          interval: parseInt(inputArray[0]), 
-          time: moment(outputDate + ' ' + inputArray[1]).valueOf(),
-          speed: inputArray[4] === '---' ? 0 : parseFloat(inputArray[4]),   
-          strokeRate: inputArray[4] === '---' ? 0 : parseFloat(inputArray[5])     
-        }
-      })
-      console.log('jsonDetailData', this.jsonDetailData)
-      this.trainingDetailData = JSON.stringify(this.jsonDetailData)
     },
     removefile(e) {
       this.file = ''
     },   
     ready() {
+    },
+    setDate(selectedDate){
+      this.trainingDate = selectedDate.getTime()
     }
+
   }
 }
 </script>

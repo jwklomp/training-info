@@ -4,25 +4,32 @@
     <div class="">
       <h2>Your Trainings:</h2>
       <ul class='training-list'>
-        <li class="training-item" v-for="item in trainingList | orderBy 'time' -1 ">
-          <h4 class="training-title">{{ item.brewery }}, {{ item.trainingName }}</h4><button  class="close-btn btn btn-default btn-xs" v-on:click="deleteItem($key)">X</button>
+        <li class="training-item" v-for="item in trainingList | orderBy 'time' -1 " v-on:click="setCurrentItem(item)">
+          <h4 class="training-title">{{ item.training}}, {{ item.trainingName }}, {{ item.trainingType}}, {{ item.trainingDate}}</h4><button  class="close-btn btn btn-default btn-xs" v-on:click="deleteItem($key)">X</button>
           <div class="stars">
             <img v-for="n in item.rating" class="star-img" src="../assets/star.png" alt="">
           </div>
         </li>
       </ul>
+      <training-graph v-bind:graph-data-array="currentData"></training-graph>
     </div>    
   </div>
 </template>
 
 <script>
-  import firebase from 'firebase'
+import firebase from 'firebase'
+import TrainingGraph from './TrainingGraph.vue'
 export default {
   data () {
     return {
+      currentItem: {},
+      currentData: [],
       trainingList: [],
       user: firebase.auth().currentUser
     }
+  },
+  components: {
+      TrainingGraph
   },
   methods: {
    logout() {
@@ -44,6 +51,11 @@ export default {
           .catch(function(error) {
             console.log('Remove failed: ' + error.message)
           })
+    },
+    setCurrentItem(item) {
+      this.currentItem = item
+      this.currentData = item.data.split('\n')
+      console.log(item)
     }
    },
   ready: function () {

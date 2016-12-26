@@ -1,7 +1,6 @@
 import firebase from 'firebase'
 
 export function fireInit(func) {
-	// !!!! Replace with your own Firebase settings !!!!!
 	var config = {
     apiKey: 'AIzaSyDlnkurDNAYZAF7h9HY3voH0dfKAUhuw-s',
     authDomain: 'training-info.firebaseapp.com',

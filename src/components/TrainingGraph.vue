@@ -12,7 +12,6 @@ export default {
   props: ['graphDataArray'],
   watch: {
     graphDataArray: function (newGraphDataArray) {
-      console.log(newGraphDataArray)
       var jsonDetailData = this.makeJsonDetailData(newGraphDataArray)
       this.makeGraph(jsonDetailData)
     }

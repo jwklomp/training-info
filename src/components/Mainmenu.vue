@@ -18,19 +18,14 @@ export default {
   data () {
     return {
       arrNav: [{
-        'title': 'Home',
+        'title': 'Training List',
         'id': '/',
         'auth': true
       },
       {
-        'title': 'Training List',
-        'id': '/traininglist',
-        'auth': false
-      },
-      {
         'title': 'Enter Training',
         'id': '/entertraining',
-        'auth': false
+        'auth': true
       }],
       cur: ' '
     }
@@ -40,7 +35,6 @@ export default {
       window.location.href = 'auth.html'
     },
     logout() {
-      console.log('out')
       firebase.auth().signOut().then(function() {
         window.location.href = '/auth.html'
       }, function(error) {

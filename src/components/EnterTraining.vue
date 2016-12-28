@@ -18,6 +18,8 @@
       <option>7 x 3 min</option>
       <option>5 x 5 min</option>
       <option>3 x 10 min</option>
+      <option>6 x 500 m</option>
+      <option>7 x 300 m</option>
     </select>
     <br/>
 
@@ -97,14 +99,15 @@ export default {
     submit() {
       var user = firebase.auth().currentUser
       var d = Date.now()
-      firebase.database().ref('users/' + user.uid).push({
+      firebase.database().ref('/training').push({
         training: this.training,
         trainingName: this.trainingName,
         trainingType: this.trainingType,
         trainingDate: this.trainingDate,
         rating: this.rating,
         data: this.data,
-        time: d
+        time: d,
+        user: user.uid
       })
       this.$route.router.go({path: '/traininglist'})
     },

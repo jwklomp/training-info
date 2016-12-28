@@ -3,9 +3,10 @@
   <div class="training-list">
     <div class="">
       <h2>Your Trainings:</h2>
+      <h3>Click on a training to see the speed graph</h3>
       <ul class='training-list'>
         <li class="training-item" v-for="item in trainingList | orderBy 'time' -1 " v-on:click="setCurrentItem(item)">
-          <h4 class="training-title">{{ item.training}}, {{ item.trainingName }}, {{ item.trainingType}}, {{ item.trainingDate}}</h4><button  class="close-btn btn btn-default btn-xs" v-on:click="deleteItem($key)">X</button>
+          <h4 class="training-title">{{ item.training}}, {{ item.trainingName }}, {{ item.trainingType}}, {{ formatDate(item.trainingDate) }}</h4><button  class="close-btn btn btn-default btn-xs" v-on:click="deleteItem($key)">X</button>
           <div class="stars">
             <img v-for="n in item.rating" class="star-img" src="../assets/star.png" alt="">
           </div>
@@ -19,6 +20,7 @@
 <script>
 import firebase from 'firebase'
 import TrainingGraph from './TrainingGraph.vue'
+var moment = require('moment')
 export default {
   data () {
     return {
@@ -33,7 +35,6 @@ export default {
   },
   methods: {
    logout() {
-      console.log('out')
       firebase.auth().signOut().then(function() {
         window.location.href = '/auth.html'
       }, function(error) {
@@ -42,8 +43,7 @@ export default {
     },
     deleteItem(key) {
       console.log('delete: ' + key)
-      var user = firebase.auth().currentUser
-      var adaRef = firebase.database().ref('users/' + user.uid + '/' + key)
+      var adaRef = firebase.database().ref('/training' + key)
         adaRef.remove()
           .then(function() {
             console.log('Remove succeeded.')
@@ -55,13 +55,14 @@ export default {
     setCurrentItem(item) {
       this.currentItem = item
       this.currentData = item.data.split('\n')
-      console.log(item)
+    }, 
+    formatDate(date) {
+      return moment(date).format('DD-MM-YYYY')
     }
    },
   ready: function () {
-    var user = firebase.auth().currentUser
     var _this = this
-    firebase.database().ref('users/' + user.uid).on('value', function(snapshot) {
+    firebase.database().ref('/training').on('value', function(snapshot) {
       _this.trainingList = snapshot.val()
     })
   }

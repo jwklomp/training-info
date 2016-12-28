@@ -21,3 +21,12 @@ npm run e2e
 # run all tests
 npm test
 ```
+
+## Firebase deploy
+``` bash
+# initialize
+firebase init
+
+# deploy: first do a npm run build
+firebase deploy
+```

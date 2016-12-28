@@ -19,7 +19,7 @@ export default {
     return {
       arrNav: [{
         'title': 'Training List',
-        'id': '/',
+        'id': '/traininglist',
         'auth': true
       },
       {

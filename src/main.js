@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 // import firebase from 'firebase'
 import {fireInit} from './helpers/firebaseHelpers'
-import Overview from './components/Overview.vue'
 import TrainingList from './components/TrainingList.vue'
 import EnterTraining from './components/EnterTraining.vue'
 import Mainmenu from './components/Mainmenu.vue'
@@ -34,7 +33,7 @@ var router = new VueRouter({linkActiveClass: 'active'})
 function setRouter() {
 	router.map({
 		 '/': {
-	        component: Overview
+	        component: TrainingList
 	    },
 	    '/entertraining': {
 	        component: EnterTraining,

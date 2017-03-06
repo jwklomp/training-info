@@ -3,16 +3,29 @@
   <div class="training-list">
     <div class="">
       <h2>Your Trainings:</h2>
-      <h3>Click a training to see the speed graph</h3>
-      <ul class='training-list'>
-        <li class="training-item" v-for="item in trainingList | orderBy 'time' -1 " v-on:click="setCurrentItem(item)">
-          <h4 class="training-title">{{ item.training}}, {{ item.trainingName }}, {{ item.trainingType}}, {{ formatDate(item.trainingDate) }}</h4><button  class="close-btn btn btn-default btn-xs" v-on:click="deleteItem($key)">X</button>
-          <div class="stars">
-            <img v-for="n in item.rating" class="star-img" src="../assets/star.png" alt="">
-          </div>
-        </li>
-      </ul>
-      <training-graph v-bind:graph-data-array="currentData"></training-graph>
+      <span class="label label-default">Click a training to see the speed graph</span>
+      <table class="table table-hover">
+      <thead> 
+        <tr> 
+          <th>Training</th>
+          <th>Description</th>
+          <th>Type</th>
+          <th colspan="2">Date</th>
+        </tr> 
+      </thead>
+      <tbody> 
+        <tr v-for="item in trainingList | orderBy 'time' -1 " v-on:click="setCurrentItem(item)"  v-bind:class="{ info: item == this.currentItem}"> 
+          <th scope="row">{{ item.training}}</th> 
+          <td>{{ item.trainingName }}</td> 
+          <td>{{ item.trainingType}}</td> 
+          <td>{{ formatDate(item.trainingDate) }}</td>
+          <td><button class="btn btn-warning" v-on:click="deleteItem($key)">Delete</button></td>
+        </tr> 
+      </tbody>
+      </table>
+
+      <training-graph v-if="typeof currentData !== undefined && currentData[0] !== ''" v-bind:graph-data-array="currentData"></training-graph>
+      <div v-if="typeof currentData == undefined || currentData[0] == ''">Selected training has no graph data</div>
     </div>    
   </div>
 </template>
@@ -44,7 +57,7 @@ export default {
     },
     deleteItem(key) {
       console.log('delete: ' + key)
-      var adaRef = firebase.database().ref('/training' + key)
+      var adaRef = firebase.database().ref('/training/' + key)
         adaRef.remove()
           .then(function() {
             console.log('Remove succeeded.')
@@ -86,14 +99,8 @@ h1 {
 .star-img{
   width:20px;
 }
-.training-item{
-  border-bottom: 1px dotted #999;
-  padding-bottom: 10px;
+.well {
+    background: none;
 }
-.training-list{
-  list-style: none;
-  padding-left: 0;
-}
-
 </style>
 

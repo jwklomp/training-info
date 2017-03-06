@@ -1,6 +1,14 @@
 
 <template>
+
+
+
   <div class="main-menu">
+
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
      <ul class="nav nav-pills">
       <li role="presentation" v-for="item in arrNav" v-link-active v-if="item.auth || authenticated">
         <a v-link="{ path: item.id, exact: true }">{{ item.title}}</a>
@@ -8,6 +16,11 @@
      </ul>
       <button  v-if="authenticated" class="btn btn-default log-btn" v-on:click="logout()">Log Out</button>
       <button  v-else class="btn btn-default log-btn" v-on:click="login()">Log In</button>
+    </div>
+  </div>
+</nav>
+
+
   </div>
 </template>
 
@@ -26,8 +39,7 @@ export default {
         'title': 'Enter Training',
         'id': '/entertraining',
         'auth': true
-      }],
-      cur: ' '
+      }]
     }
   },
   methods: {
@@ -64,9 +76,9 @@ export default {
     margin-top: 20px;
   }
   .log-btn{
-    display: inline-block;
-    vertical-align: top;
     margin-left: 40px;
+    vertical-align: top;
+    margin-top: 3px;
   }
   .container{
     margin-left: 20px;
